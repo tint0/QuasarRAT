@@ -902,5 +902,39 @@ namespace xServer.Forms
         }
 
         #endregion
+
+        private void portForwardFromClientToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //foreach (Client c in GetSelectedClients())
+            //{
+            //    if (c.Value.FrmFwd != null)
+            //    {
+            //        c.Value.FrmFwd.Focus();
+            //        return;
+            //    }
+
+            //    FrmPortForwardLocal frmFwd = new FrmPortForwardLocal(c);
+            //    frmFwd.Show();
+            //}
+        }
+
+        private void portForwardFromLocalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Client[] selectedClients = GetSelectedClients();
+            if (selectedClients.Length != 1)
+            {
+                MessageBox.Show("Please select only 1 client");
+            }
+            Client c = selectedClients[0];
+            if (c.Value.FrmProxy != null)
+            {
+                c.Value.FrmProxy.Focus();
+                return;
+            }
+
+            FrmPortForwardLocal frmFwd = new FrmPortForwardLocal(c);
+            frmFwd.Show();
+            
+        }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using xServer.Core.Commands;
 using xServer.Core.Networking;
+using xServer.Core.PortForward;
+using xServer.Core.PortForward.Local;
 using xServer.Core.ReverseProxy;
 
 namespace xServer.Core.Packets
@@ -124,6 +126,22 @@ namespace xServer.Core.Packets
             {
                 CommandHandler.HandleGetConnectionsResponse(client, (ClientPackets.GetConnectionsResponse)packet);
             }
+            //else if (type == typeof(PortForward.Packets.PortForwardInit) ||
+            //    type == typeof(PortForward.Packets.PortForwardInitResponse) ||
+            //    type == typeof(PortForward.Packets.PortForwardDisconnect)
+            //    )
+            //{
+            //    PortForwardCommandHandler.HandleCommand(client, packet);
+            //}
+            else if (type == typeof(PortForward.Local.Packets.LocalPortForwardConnect) ||
+                type == typeof(PortForward.Local.Packets.LocalPortForwardConnectResponse) ||
+                type == typeof(PortForward.Local.Packets.LocalPortForwardData) ||
+                type == typeof(PortForward.Local.Packets.LocalPortForwardDisconnect)
+                )
+            {
+                LocalPortForwardCommandHandler.HandleCommand(client, packet);
+            }
+
         }
     }
 }

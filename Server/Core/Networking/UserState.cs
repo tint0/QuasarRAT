@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using xServer.Core.PortForward.Local;
 using xServer.Core.ReverseProxy;
 using xServer.Core.Utilities;
 using xServer.Forms;
@@ -36,11 +37,15 @@ namespace xServer.Core.Networking
         public FrmReverseProxy FrmProxy { get; set; }
         public FrmPasswordRecovery FrmPass { get; set; }
         public FrmConnections FrmCon { get; set; }
+        //public FrmPortForwardClient FrmFwd { get; set; }
+        public FrmPortForwardLocal FrmFwdFromLocal { get; set; }
 
 
         public bool ReceivedLastDirectory { get; set; }
         public UnsafeStreamCodec StreamCodec { get; set; }
         public ReverseProxyServer ProxyServer { get; set; }
+        //public LocalPortForwardTracker PortForwardTracker { get; set; }
+        public LocalPortForwardTracker LocalPortForwardTracker { get; set; }
 
         public bool ProcessingDirectory
         {
@@ -104,6 +109,8 @@ namespace xServer.Core.Networking
                         FrmPass.Invoke((MethodInvoker)delegate { FrmPass.Close(); });
                     if (FrmCon != null)
                         FrmCon.Invoke((MethodInvoker)delegate { FrmCon.Close(); });
+                    if (FrmFwdFromLocal != null)
+                        FrmFwdFromLocal.Invoke((MethodInvoker)delegate { FrmFwdFromLocal.Close(); });
                 }
                 catch (InvalidOperationException)
                 {
