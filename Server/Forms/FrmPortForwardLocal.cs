@@ -43,7 +43,7 @@ namespace xServer.Forms
             server.StartServer();
         }
 
-        void RefreshTimer_Tick(object sender, EventArgs e)
+        private void RefreshTimer_Tick(object sender, EventArgs e)
         {
             try
             {

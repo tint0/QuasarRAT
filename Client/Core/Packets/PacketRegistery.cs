@@ -93,8 +93,8 @@ namespace xClient.Core.Packets
                 typeof (PortForward.Local.Packets.LocalPortForwardConnect),
                 typeof (PortForward.Local.Packets.LocalPortForwardConnectResponse),
                 typeof (PortForward.Local.Packets.LocalPortForwardData),
-                typeof (PortForward.Local.Packets.LocalPortForwardDisconnect)
-
+                typeof (PortForward.Local.Packets.LocalPortForwardDisconnect),
+                typeof (ServerPackets.DoSleep)
             };
         }
     }

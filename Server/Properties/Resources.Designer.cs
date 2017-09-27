@@ -449,26 +449,7 @@ namespace xServer.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to     Quasar - Remote Administration Tool
-        ///    Copyright (C) 2016 MaxX0r
-        ///
-        ///    Quasar is free software: you can redistribute it and/or modify
-        ///    it under the terms of the GNU General Public License as published by
-        ///    the Free Software Foundation, either version 3 of the License, or
-        ///    (at your option) any later version.
-        ///
-        ///    Quasar is distributed in the hope that it will be useful,
-        ///    but WITHOUT ANY WARRANTY; without even the implied warranty of
-        ///    MERCHANTABILITY or FITNESS FOR A PARTICULAR PUR [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string TermsOfUse {
-            get {
-                return ResourceManager.GetString("TermsOfUse", resourceCulture);
-            }
-        }
-        
+                
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>

@@ -19,6 +19,11 @@ namespace xClient.Core.Networking
 {
     public class Client
     {
+        public IPEndPoint LocalAddress { get
+            {
+                return _handle.LocalEndPoint as IPEndPoint;
+            }
+        }
         /// <summary>
         /// Occurs as a result of an unrecoverable issue with the client.
         /// </summary>

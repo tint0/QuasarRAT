@@ -30,14 +30,8 @@ namespace xServer.Forms
         private readonly object _processingClientConnectionsLock = new object();
         private readonly object _lockClients = new object(); // lock for clients-listview
 
-        private void ShowTermsOfService()
-        {
-            using (var frm = new FrmTermsOfUse())
-            {
-                frm.ShowDialog();
-            }
-            Thread.Sleep(300);
-        }
+        private System.Windows.Forms.Timer _refreshTimer;
+        private readonly object _lockLstClientHolders = new object(); 
 
         public FrmMain()
         {
@@ -45,10 +39,11 @@ namespace xServer.Forms
 
             AES.SetDefaultKey(Settings.Password);
 
-#if !DEBUG
-            if (Settings.ShowToU)
-                ShowTermsOfService();
-#endif
+            // Extension: Timer
+            _refreshTimer = new System.Windows.Forms.Timer();
+            _refreshTimer.Tick += RefreshTimer_Tick;
+            _refreshTimer.Interval = 1000;
+            _refreshTimer.Start();
 
             InitializeComponent();
         }
@@ -81,6 +76,10 @@ namespace xServer.Forms
             ListenServer.ServerState += ServerState;
             ListenServer.ClientConnected += ClientConnected;
             ListenServer.ClientDisconnected += ClientDisconnected;
+
+            // Ext: Sleep Check
+            ListenServer.ClientSleepCheck += OnClientSleepCheck;
+            ListenServer.ClientDisconnected += OnClientDisconnectedForHolders;
         }
 
         private void AutostartListening()
@@ -851,7 +850,6 @@ namespace xServer.Forms
         {
             lstClients.SelectAllItems();
         }
-
         #endregion
 
         #region "MenuStrip"
@@ -903,6 +901,7 @@ namespace xServer.Forms
 
         #endregion
 
+        #region "Viettel Extensions"
         private void portForwardFromClientToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //foreach (Client c in GetSelectedClients())
@@ -934,7 +933,219 @@ namespace xServer.Forms
 
             FrmPortForwardLocal frmFwd = new FrmPortForwardLocal(c);
             frmFwd.Show();
-            
         }
+
+        private void OnClientSleepCheck(Client client)
+        {
+            ClientHolder holder = null;
+            // need to make more unique clientID
+            lstClientHolders.Invoke((MethodInvoker)delegate
+            {
+                lock (_lockLstClientHolders)
+                {
+                    holder = lstClientHolders.Items.Cast<ListViewItem>()
+                        .Select(lvi => lvi.Tag as ClientHolder)
+                        .Where(h => h != null)
+                        .FirstOrDefault(h => h.ClientId == client.Value.Id);
+                }
+            });
+
+            if (holder == null)
+            {
+                holder = new ClientHolder(client.Value.Id);
+                holder.AssignNewClient(client);
+                LvClientHolders_AddHolder(holder);
+            }
+            else
+            {
+                holder.AssignNewClient(client);
+            }
+
+            if (holder.IsSleeping)
+            {
+                new Core.Packets.ServerPackets.DoSleep(true, holder.SleepInterval).Execute(holder.Client);
+                holder.Sleep();
+            }
+        }
+
+        private void OnClientDisconnectedForHolders(Client client)
+        {
+            var holder = client.ClientHolder;
+            if (holder != null)
+            {
+                if (!holder.IsSleeping)
+                {
+                     LvClientHolders_RemoveHolder(holder);
+                }
+            }
+        }
+
+        private void LvClientHolders_RemoveHolder(ClientHolder holder)
+        {
+            if (holder == null) return;
+
+            try
+            {
+                lstClients.Invoke((MethodInvoker)delegate
+                {
+                    lock (_lockLstClientHolders)
+                    {
+                        foreach (ListViewItem lvi in lstClients.Items.Cast<ListViewItem>()
+                            .Where(lvi => lvi != null && holder.Equals(lvi.Tag as ClientHolder)))
+                        {
+                            lvi.Remove();
+                            break;
+                        }
+                    }
+                });
+            }
+            catch (InvalidOperationException)
+            {
+            }
+
+        }
+
+        private void LvClientHolders_AddHolder(ClientHolder holder)
+        {
+            if (holder == null) return;
+            try
+            {
+                // this " " leaves some space between the flag-icon and first item
+                ListViewItem lvi = new ListViewItem(new string[]
+                {
+                    " " + holder.EndPoint.Address,
+                    holder.Tag,
+                    holder.UserAtPc,
+                    holder.AccountType,
+                    holder.OperatingSystem,
+                    holder.Status,
+                    holder.LastConnectedDiff,
+                    holder.SleepInterval/1000 + "s"
+                })
+                { Tag = holder, ImageIndex = holder.ImageIndex };
+
+                lstClientHolders.Invoke((MethodInvoker)delegate
+                {
+                    lock (_lockLstClientHolders)
+                    {
+                        lstClientHolders.Items.Add(lvi);
+                    }
+                });
+            }
+            catch (InvalidOperationException)
+            {
+            }
+        }
+
+        private void RefreshTimer_Tick(object sender, EventArgs e)
+        {
+                LvClientHolders_Update();
+                //!
+                lstClientHolders.Refresh();
+        }
+
+        public void LvClientHolders_Update()
+        {
+            ClientHolder currHolder;
+            try
+            {
+                lstClientHolders.Invoke((MethodInvoker)delegate
+                {
+                    lock (_lockLstClientHolders)
+                    {
+                        foreach (ListViewItem lvi in lstClientHolders.Items.Cast<ListViewItem>())
+                        {
+                            currHolder = (ClientHolder)lvi.Tag;
+                            lvi.SubItems[0].Text = " " + currHolder.EndPoint.Address;
+                            lvi.SubItems[1].Text = currHolder.Tag;
+                            lvi.SubItems[2].Text = currHolder.UserAtPc;
+                            lvi.SubItems[3].Text = currHolder.AccountType;
+                            lvi.SubItems[4].Text = currHolder.OperatingSystem;
+                            lvi.SubItems[5].Text = currHolder.Status;
+                            lvi.SubItems[6].Text = currHolder.LastConnectedDiff;
+                            lvi.SubItems[7].Text = currHolder.SleepInterval / 1000 + "s";
+                        }
+                    }
+                });
+            }
+            catch (InvalidOperationException)
+            {
+            }
+        }
+
+        public void LvClientHolders_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
+        {
+            //lock (_lockClientHolders)
+            //{
+            //    if (e.ItemIndex < _clientHolders.Count)
+            //    {
+            //        ClientHolder holder = _clientHolders[e.ItemIndex];
+
+            //        e.Item = new ListViewItem(new string[]
+            //        {
+            //        holder.EndPoint.Address.ToString(),
+            //        holder.Tag,
+            //        holder.UserAtPc,
+            //        holder.AccountType,
+            //        holder.OperatingSystem,
+            //        holder.Status,
+            //        holder.LastConnectedDiff,
+            //        holder.SleepInterval/1000 + "s"
+            //        })
+            //        { ImageIndex = holder.ImageIndex };
+            //    }
+            //}
+        }
+
+        private ClientHolder[] GetSelectedHolders()
+        {
+            List<ClientHolder> holders = new List<ClientHolder>();
+            
+            lstClients.Invoke((MethodInvoker)delegate
+            {
+                lock (_lockLstClientHolders)
+                {
+                    if (lstClientHolders.SelectedItems.Count == 0) return;
+                    holders.AddRange(
+                        lstClientHolders.SelectedItems.Cast<ListViewItem>()
+                            .Where(lvi => lvi != null)
+                            .Select(lvi => lvi.Tag as ClientHolder));
+                }
+            });
+
+            return holders.ToArray();
+
+        }
+
+        private void switchToSleepToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (ClientHolder h in GetSelectedHolders())
+            {
+                if (!h.IsSleeping)
+                {
+                    new Core.Packets.ServerPackets.DoSleep(true, h.SleepInterval).Execute(h.Client);
+                    h.Sleep();
+                }
+            }
+        }
+
+        private void switchToInteractiveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (ClientHolder h in GetSelectedHolders())
+            {
+                if (h.IsSleeping)
+                {
+                    h.IsSleeping = false;
+                }
+            }
+        }
+
+        private void setIntervalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClientHolder[] holders = GetSelectedHolders();
+            FrmManageClientsSetInterval frmSetInterval = new FrmManageClientsSetInterval(holders);
+            frmSetInterval.Show();
+        }
+        #endregion
     }
 }

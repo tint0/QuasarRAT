@@ -24,6 +24,9 @@ namespace xServer.Core.Networking
         public string CountryWithCode { get { return string.Format("{0} [{1}]", Country, CountryCode); } }
         public string Tag { get; set; }
         public string DownloadDirectory { get; set; }
+        public int IsSleeping { get; set; }
+        public string LastConnected { get; set; }
+
 
         public FrmRemoteDesktop FrmRdp { get; set; }
         public FrmRemoteWebcam FrmWebcam { get; set; }

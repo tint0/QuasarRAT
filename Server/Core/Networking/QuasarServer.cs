@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using xServer.Core.Commands;
 using xServer.Core.NetSerializer;
 using xServer.Core.Packets;
@@ -8,12 +10,38 @@ namespace xServer.Core.Networking
 {
     public class QuasarServer : Server
     {
+        //public static string GenerateClientId()
+        //{
+        //    string curTimeStamp = 
+        //        (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds.ToString();
+        //    // md5
+        //    StringBuilder hashBuilder = new StringBuilder();
+        //    MD5CryptoServiceProvider md5provider = new MD5CryptoServiceProvider();
+        //    byte[] hashBytes = md5provider.ComputeHash(new UTF8Encoding().GetBytes(curTimeStamp));
+
+        //    for (int i = 0; i < hashBytes.Length; i++)
+        //    {
+        //        hashBuilder.Append(hashBytes[i].ToString("x2"));
+        //    }
+        //    return hashBuilder.ToString();
+        //}
+        
         /// <summary>
         /// Gets the clients currently connected and authenticated to the server.
         /// </summary>
         public Client[] ConnectedClients
         {
             get { return Clients.Where(c => c != null && c.Authenticated).ToArray(); }
+        }
+
+        public event ClientSleepCheckEventHandler ClientSleepCheck;
+
+        public delegate void ClientSleepCheckEventHandler(Client client);
+
+        private void OnClientSleepCheck(Client client)
+        {
+            if (ProcessingDisconnect || !Listening) return;
+            ClientSleepCheck?.Invoke(client);
         }
 
         /// <summary>
@@ -75,6 +103,7 @@ namespace xServer.Core.Networking
 
             base.ClientState += OnClientState;
             base.ClientRead += OnClientRead;
+            
         }
 
         /// <summary>
@@ -117,7 +146,12 @@ namespace xServer.Core.Networking
                     new Packets.ServerPackets.SetAuthenticationSuccess().Execute(client); // finish handshake
                     CommandHandler.HandleGetAuthenticationResponse(client,
                         (Packets.ClientPackets.GetAuthenticationResponse) packet);
-                    OnClientConnected(client);
+                    // Check sleeping before ClientConnected event to show on UI
+                    OnClientSleepCheck(client);
+                    if (!client.IsSleeping)
+                    {
+                        OnClientConnected(client);
+                    }
                 }
                 else
                 {
@@ -125,7 +159,7 @@ namespace xServer.Core.Networking
                 }
                 return;
             }
-
+            
             PacketHandler.HandlePacket(client, packet);
         }
     }

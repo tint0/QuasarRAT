@@ -13,6 +13,7 @@ namespace xClient.Core.Networking
 {
     public class QuasarClient : Client
     {
+        public int SleepInterval { get; set; }
         /// <summary>
         /// When Exiting is true, stop all running threads and exit.
         /// </summary>
@@ -59,7 +60,14 @@ namespace xClient.Core.Networking
                     return;
                 }
 
-                Thread.Sleep(Settings.RECONNECTDELAY + new Random().Next(250, 750));
+                if (SleepInterval != 0)
+                {
+                    Thread.Sleep(SleepInterval - 2500 + new Random().Next(250, 750));
+                }
+                else
+                {
+                    Thread.Sleep(Settings.RECONNECTDELAY + new Random().Next(250, 750));
+                }
             }
         }
 

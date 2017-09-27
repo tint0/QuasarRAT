@@ -13,6 +13,17 @@ namespace xServer.Core.Networking
 {
     public class Client : IEquatable<Client>
     {
+        public ClientHolder ClientHolder { get; set; }
+        public bool IsSleeping { get
+            {
+                if (ClientHolder != null)
+                {
+                    return ClientHolder.IsSleeping;
+                }
+                return false;
+            }
+        }
+
         /// <summary>
         /// Occurs when the state of the client changes.
         /// </summary>
@@ -141,7 +152,7 @@ namespace xServer.Core.Networking
         /// <summary>
         /// Handle of the Client Socket.
         /// </summary>
-        private Socket _handle;
+        public Socket Handle { get; private set; }
 
         /// <summary>
         /// The Queue which holds buffers to send.
@@ -246,16 +257,16 @@ namespace xServer.Core.Networking
                 _parentServer = parentServer;
                 Initialize();
 
-                _handle = socket;
-                _handle.SetKeepAliveEx(_parentServer.KEEP_ALIVE_INTERVAL, _parentServer.KEEP_ALIVE_TIME);
+                Handle = socket;
+                Handle.SetKeepAliveEx(_parentServer.KEEP_ALIVE_INTERVAL, _parentServer.KEEP_ALIVE_TIME);
 
-                EndPoint = (IPEndPoint)_handle.RemoteEndPoint;
+                EndPoint = (IPEndPoint)Handle.RemoteEndPoint;
                 ConnectedTime = DateTime.UtcNow;
 
                 _readBuffer = _parentServer.BufferManager.GetBuffer();
                 _tempHeader = new byte[_parentServer.HEADER_SIZE];
 
-                _handle.BeginReceive(_readBuffer, 0, _readBuffer.Length, SocketFlags.None, AsyncReceive, null);
+                Handle.BeginReceive(_readBuffer, 0, _readBuffer.Length, SocketFlags.None, AsyncReceive, null);
                 OnClientState(true);
             }
             catch (Exception)
@@ -270,13 +281,19 @@ namespace xServer.Core.Networking
             Value = new UserState();
         }
 
+        //public void RenewSocket(Socket socket)
+        //{
+        //    Handle = socket;
+        //    Handle.BeginReceive(_readBuffer, 0, _readBuffer.Length, SocketFlags.None, AsyncReceive, null);
+        //}
+
         private void AsyncReceive(IAsyncResult result)
         {
             int bytesTransferred;
 
             try
             {
-                bytesTransferred = _handle.EndReceive(result);
+                bytesTransferred = Handle.EndReceive(result);
 
                 if (bytesTransferred <= 0)
                     throw new Exception("no bytes transferred");
@@ -325,7 +342,7 @@ namespace xServer.Core.Networking
 
             try
             {
-                _handle.BeginReceive(_readBuffer, 0, _readBuffer.Length, SocketFlags.None, AsyncReceive, null);
+                Handle.BeginReceive(_readBuffer, 0, _readBuffer.Length, SocketFlags.None, AsyncReceive, null);
             }
             catch (ObjectDisposedException)
             {
@@ -607,7 +624,7 @@ namespace xServer.Core.Networking
                 {
                     var packet = BuildPacket(payload);
                     _parentServer.BytesSent += packet.Length;
-                    _handle.Send(packet);
+                    Handle.Send(packet);
                 }
                 catch (Exception)
                 {
@@ -653,10 +670,16 @@ namespace xServer.Core.Networking
         /// </summary>
         public void Disconnect()
         {
-            if (_handle != null)
+            //if (IsSleeping)
+            //{
+            //    // Disconnect going to sleep mode
+            //    Disconnect(false, true);
+            //}
+            //else
+            if (Handle != null)
             {
-                _handle.Close();
-                _handle = null;
+                Handle.Close();
+                Handle = null;
                 _readOffset = 0;
                 _writeOffset = 0;
                 _tempHeaderOffset = 0;
@@ -670,11 +693,67 @@ namespace xServer.Core.Networking
                     Value.Dispose();
                     Value = null;
                 }
-                
+
                 _parentServer.BufferManager.ReturnBuffer(_readBuffer);
             }
 
             OnClientState(false);
         }
+
+
+        //// for reconnect
+        //public void Disconnect(bool preserveSocket, bool preserveState)
+        //{
+        //    if (preserveSocket)
+        //    {
+        //        if (Handle != null)
+        //        {
+        //            // No Handle.Close();
+        //            Handle = null;
+        //            _readOffset = 0;
+        //            _writeOffset = 0;
+        //            _tempHeaderOffset = 0;
+        //            _readableDataLen = 0;
+        //            _payloadLen = 0;
+        //            _payloadBuffer = null;
+        //            _receiveState = ReceiveType.Header;
+
+        //            if (Value != null)
+        //            {
+        //                Value.Dispose();
+        //                Value = null;
+        //            }
+
+        //            _parentServer.BufferManager.ReturnBuffer(_readBuffer);
+        //        }
+        //        OnClientState(false);
+        //    }
+
+        //    if (preserveState)
+        //    {
+        //        if (Handle != null)
+        //        {
+        //            Handle.Close();
+        //            Handle = null;
+        //            _readOffset = 0;
+        //            _writeOffset = 0;
+        //            _tempHeaderOffset = 0;
+        //            _readableDataLen = 0;
+        //            _payloadLen = 0;
+        //            _payloadBuffer = null;
+        //            _receiveState = ReceiveType.Header;
+
+        //            if (Value != null)
+        //            {
+        //                Value.Dispose();
+        //                Value = null;
+        //            }
+
+        //            _parentServer.BufferManager.ReturnBuffer(_readBuffer);
+        //        }
+        //        // No OnClientState(false);
+        //    }
+        //}
+
     }
 }

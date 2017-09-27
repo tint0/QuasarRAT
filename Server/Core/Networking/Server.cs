@@ -12,6 +12,17 @@ namespace xServer.Core.Networking
 {
     public class Server
     {
+
+        //public event ClientReconnectedEventHandler ClientReconnected;
+
+        //public delegate void ClientReconnectedEventHandler(Client client);
+
+        //public void OnClientReconnected(Client client)
+        //{
+        //    if (ProcessingDisconnect || !Listening) return;
+        //    ClientReconnected?.Invoke(client);
+        //}
+
         /// <summary>
         /// Occurs when the state of the server changes.
         /// </summary>

@@ -12,7 +12,6 @@ namespace xServer.Forms
             InitializeComponent();
 
             lblVersion.Text = "v" + Application.ProductVersion;
-            rtxtContent.Text = Properties.Resources.TermsOfUse;
 
             lnkGithubPage.Links.Add(new LinkLabel.Link { LinkData = Settings.RepositoryURL });
             lnkCredits.Links.Add(new LinkLabel.Link { LinkData = Settings.RepositoryURL + "#credits" });

