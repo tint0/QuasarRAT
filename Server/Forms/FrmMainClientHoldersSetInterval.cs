@@ -10,11 +10,11 @@ using xServer.Core.Networking;
 
 namespace xServer.Forms
 {
-    public partial class FrmManageClientsSetInterval : Form
+    public partial class FrmMainClientHoldersSetInterval : Form
     {
         private ClientHolder[] _holders;
 
-        public FrmManageClientsSetInterval(ClientHolder[] holders)
+        public FrmMainClientHoldersSetInterval(ClientHolder[] holders)
         {
             _holders = holders;
 
@@ -35,7 +35,7 @@ namespace xServer.Forms
             }
             foreach (ClientHolder holder in _holders)
             {
-                holder.SleepInterval = (int)interval * 1000;
+                holder.SleepInterval = (int)(interval * 1000);
             }
             
             this.Close();

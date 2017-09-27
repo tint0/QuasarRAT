@@ -990,12 +990,9 @@ namespace xServer.Forms
                 {
                     lock (_lockLstClientHolders)
                     {
-                        foreach (ListViewItem lvi in lstClients.Items.Cast<ListViewItem>()
-                            .Where(lvi => lvi != null && holder.Equals(lvi.Tag as ClientHolder)))
-                        {
-                            lvi.Remove();
-                            break;
-                        }
+                        ListViewItem lvi = lstClientHolders.Items.Cast<ListViewItem>()
+                            .FirstOrDefault(i => i != null && holder.Equals((ClientHolder)i.Tag)); // holder and lvi.Tag points to the same object
+                        lvi.Remove();
                     }
                 });
             }
@@ -1073,30 +1070,6 @@ namespace xServer.Forms
             }
         }
 
-        public void LvClientHolders_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
-        {
-            //lock (_lockClientHolders)
-            //{
-            //    if (e.ItemIndex < _clientHolders.Count)
-            //    {
-            //        ClientHolder holder = _clientHolders[e.ItemIndex];
-
-            //        e.Item = new ListViewItem(new string[]
-            //        {
-            //        holder.EndPoint.Address.ToString(),
-            //        holder.Tag,
-            //        holder.UserAtPc,
-            //        holder.AccountType,
-            //        holder.OperatingSystem,
-            //        holder.Status,
-            //        holder.LastConnectedDiff,
-            //        holder.SleepInterval/1000 + "s"
-            //        })
-            //        { ImageIndex = holder.ImageIndex };
-            //    }
-            //}
-        }
-
         private ClientHolder[] GetSelectedHolders()
         {
             List<ClientHolder> holders = new List<ClientHolder>();
@@ -1143,7 +1116,7 @@ namespace xServer.Forms
         private void setIntervalToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ClientHolder[] holders = GetSelectedHolders();
-            FrmManageClientsSetInterval frmSetInterval = new FrmManageClientsSetInterval(holders);
+            FrmMainClientHoldersSetInterval frmSetInterval = new FrmMainClientHoldersSetInterval(holders);
             frmSetInterval.Show();
         }
         #endregion
