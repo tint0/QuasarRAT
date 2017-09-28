@@ -991,7 +991,7 @@ namespace xServer.Forms
                     lock (_lockLstClientHolders)
                     {
                         ListViewItem lvi = lstClientHolders.Items.Cast<ListViewItem>()
-                            .FirstOrDefault(i => i != null && holder.Equals((ClientHolder)i.Tag)); // holder and lvi.Tag points to the same object
+                            .FirstOrDefault(i => i != null && holder == i.Tag); // holder and lvi.Tag points to the same object
                         lvi.Remove();
                     }
                 });

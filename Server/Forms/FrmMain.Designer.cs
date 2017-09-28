@@ -80,10 +80,6 @@ namespace xServer.Forms
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.builderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.switchToSleepToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.switchToInteractiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.setIntervalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.lstClientHolders = new xServer.Controls.AeroListView();
@@ -95,6 +91,10 @@ namespace xServer.Forms
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.switchToSleepToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.switchToInteractiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setIntervalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.lstClients = new xServer.Controls.AeroListView();
@@ -111,9 +111,9 @@ namespace xServer.Forms
             this.tableLayoutPanel.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.menuStrip.SuspendLayout();
-            this.contextMenuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.contextMenuStrip1.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.SuspendLayout();
@@ -788,36 +788,6 @@ namespace xServer.Forms
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
-            // contextMenuStrip1
-            // 
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.switchToSleepToolStripMenuItem,
-            this.switchToInteractiveToolStripMenuItem,
-            this.setIntervalToolStripMenuItem});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(175, 70);
-            // 
-            // switchToSleepToolStripMenuItem
-            // 
-            this.switchToSleepToolStripMenuItem.Name = "switchToSleepToolStripMenuItem";
-            this.switchToSleepToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
-            this.switchToSleepToolStripMenuItem.Text = "Switch to Sleep";
-            this.switchToSleepToolStripMenuItem.Click += new System.EventHandler(this.switchToSleepToolStripMenuItem_Click);
-            // 
-            // switchToInteractiveToolStripMenuItem
-            // 
-            this.switchToInteractiveToolStripMenuItem.Name = "switchToInteractiveToolStripMenuItem";
-            this.switchToInteractiveToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
-            this.switchToInteractiveToolStripMenuItem.Text = "Switch to Interactive";
-            this.switchToInteractiveToolStripMenuItem.Click += new System.EventHandler(this.switchToInteractiveToolStripMenuItem_Click);
-            // 
-            // setIntervalToolStripMenuItem
-            // 
-            this.setIntervalToolStripMenuItem.Name = "setIntervalToolStripMenuItem";
-            this.setIntervalToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
-            this.setIntervalToolStripMenuItem.Text = "Set Interval";
-            this.setIntervalToolStripMenuItem.Click += new System.EventHandler(this.setIntervalToolStripMenuItem_Click);
-            // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
@@ -858,6 +828,7 @@ namespace xServer.Forms
             this.lstClientHolders.TabIndex = 5;
             this.lstClientHolders.UseCompatibleStateImageBehavior = false;
             this.lstClientHolders.View = System.Windows.Forms.View.Details;
+            this.lstClientHolders.SmallImageList = this.imgFlags;
             // 
             // columnHeader1
             // 
@@ -871,7 +842,7 @@ namespace xServer.Forms
             // columnHeader3
             // 
             this.columnHeader3.Text = "User@PC";
-            this.columnHeader3.Width = 176;
+            this.columnHeader3.Width = 111;
             // 
             // columnHeader4
             // 
@@ -891,12 +862,42 @@ namespace xServer.Forms
             // columnHeader7
             // 
             this.columnHeader7.Text = "Last Connected";
-            this.columnHeader7.Width = 101;
+            this.columnHeader7.Width = 98;
             // 
             // columnHeader8
             // 
-            this.columnHeader8.Text = "Interval";
-            this.columnHeader8.Width = 54;
+            this.columnHeader8.Text = "Sleep Interval";
+            this.columnHeader8.Width = 88;
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.switchToSleepToolStripMenuItem,
+            this.switchToInteractiveToolStripMenuItem,
+            this.setIntervalToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(175, 70);
+            // 
+            // switchToSleepToolStripMenuItem
+            // 
+            this.switchToSleepToolStripMenuItem.Name = "switchToSleepToolStripMenuItem";
+            this.switchToSleepToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.switchToSleepToolStripMenuItem.Text = "Switch to Sleep";
+            this.switchToSleepToolStripMenuItem.Click += new System.EventHandler(this.switchToSleepToolStripMenuItem_Click);
+            // 
+            // switchToInteractiveToolStripMenuItem
+            // 
+            this.switchToInteractiveToolStripMenuItem.Name = "switchToInteractiveToolStripMenuItem";
+            this.switchToInteractiveToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.switchToInteractiveToolStripMenuItem.Text = "Switch to Interactive";
+            this.switchToInteractiveToolStripMenuItem.Click += new System.EventHandler(this.switchToInteractiveToolStripMenuItem_Click);
+            // 
+            // setIntervalToolStripMenuItem
+            // 
+            this.setIntervalToolStripMenuItem.Name = "setIntervalToolStripMenuItem";
+            this.setIntervalToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.setIntervalToolStripMenuItem.Text = "Set Interval";
+            this.setIntervalToolStripMenuItem.Click += new System.EventHandler(this.setIntervalToolStripMenuItem_Click);
             // 
             // tabControl2
             // 
@@ -955,17 +956,17 @@ namespace xServer.Forms
             // hUserPC
             // 
             this.hUserPC.Text = "User@PC";
-            this.hUserPC.Width = 175;
+            this.hUserPC.Width = 111;
             // 
             // hVersion
             // 
             this.hVersion.Text = "Version";
-            this.hVersion.Width = 66;
+            this.hVersion.Width = 58;
             // 
             // hStatus
             // 
             this.hStatus.Text = "Status";
-            this.hStatus.Width = 78;
+            this.hStatus.Width = 143;
             // 
             // hUserStatus
             // 
@@ -1009,9 +1010,9 @@ namespace xServer.Forms
             this.statusStrip.PerformLayout();
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
-            this.contextMenuStrip1.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.contextMenuStrip1.ResumeLayout(false);
             this.tabControl2.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
